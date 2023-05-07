@@ -127,24 +127,57 @@ class KonaneGame2:
         """
         return Tile.P_Black if tile == Tile.P_White else Tile.P_White
 
+    def count_position_score(self, board):
+        center_piece = 0
+        edge_piece = 0
+        corner_piece = 0
+
+        for i in range(6):
+            for j in range(6):
+                # center
+                if (i == 2 or i == 3) and (j == 2 or j == 3):
+                    if board.contains(i, j, 1):
+                        center_piece += 1
+
+                # corner
+                elif (i == 0 or i == 5) and (j == 0 or j == 5):
+                    if board.contains(i, j, 1):
+                        corner_piece += 1
+
+                # edge
+                elif i == 0 or i == 5 or j == 0 or j == 5:
+                    if board.contains(i, j, 1):
+                        edge_piece += 1
+
+        return center_piece, edge_piece, corner_piece
 
 
 
     def evaluate(self, board, color, terminal_value = 0):
-        
+
+        possible_moves_weight = 8
+        score_weight = 2
+        corner_weight = 5
+        center_weight = 2
+        edge_weight = 3
+
         value = 0
         valid_moves_color = self.generate_all_possible_moves(board, color)
         valid_moves_opponent = self.generate_all_possible_moves(board, self.opponent(color))
 
-        value += (10 * len(valid_moves_color))
-        value -= (10 * len(valid_moves_opponent))
+        value += (possible_moves_weight * len(valid_moves_color))
+        value -= (possible_moves_weight * len(valid_moves_opponent))
 
-        piece_count = board.count_symbol(1) - board.count_symbol(2)
+        piece_count = score_weight * (board.count_symbol(1) - board.count_symbol(2))
+
+
+        center_piece, edge_piece, corner_piece = self.count_position_score(board)
+        tmp = (center_piece * center_weight) + (edge_piece * edge_weight) + (corner_piece * corner_weight)
 
         if color == Tile.P_White:
-            value += piece_count
+            value += (piece_count + tmp)
         else:
-            value -= piece_count
+            value -= (piece_count + tmp)
 
 
         value += terminal_value
