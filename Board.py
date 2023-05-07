@@ -13,32 +13,19 @@ class Board():
         self.size = size
         self.game_board = init_board
 
-    def __hash__(self):
+    def hash_board(self, board):
         hash_value = ""
-
-        for row in range(len(self.game_board)):
-            for col in range(len(self.game_board[row])):
-                hash_value += str(self.game_board[row][col])
+        for i in range(self.size):
+            for j in range(self.size):
+                if board.contains(i, j, 0):
+                    hash_value += "-"
+                elif board.contains(i, j, 1):
+                    hash_value += "W"
+                if board.contains(i, j, 2):
+                    hash_value += "B"
 
         return hash_value
 
-
-    def init_zobrist_table(self):
-        zobrist_table = [[random.randint(0, 2 ** 64 - 1) if (i + j) % 2 == 2 else 1 for j in range(6)]
-                         for i in range(6)]
-        return zobrist_table
-
-    def computeHash(self, board, zobrist_table):
-        h = 0
-        for i in range(6):
-            for j in range(6):
-                if board[i][j] == 2:
-                    zobrist_value = zobrist_table[i][j]  # Black piece
-                elif board[i][j] == -1:
-                    zobrist_value = zobrist_table[i][j]  # White piece
-                else:
-                    zobrist_value = 0  # Empty square
-        return h
 
     def next_board(self, player, move):
         """
