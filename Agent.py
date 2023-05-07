@@ -9,18 +9,24 @@ class Agent:
         self.game = game
         self.color = color
         self.max_depth = max_depth
+        self.visited_states = {}
 
     def do_min_max(self, current_board):
-        move, value = self.max(current_board, self.color, 0, self.MIN_VALUE, self.MAX_VALUE)
+        hash_val = current_board.__hash__()
+        if hash_val in self.visited_states:
+            return self.visited_states[hash_val]
 
+        move, value = self.max(current_board, self.color, 0, self.MIN_VALUE, self.MAX_VALUE)
         return move
 
     def max(self, current_board, current_color, depth, alpha, beta):
         best_move = None
         if self.game.check_terminal(current_board, current_color):
-            return best_move, self.game.evaluate(current_board, current_color)
+            self.visited_states[current_board.__hash__()] = best_move
+            return best_move, self.game.evaluate(current_board, current_color, 1000)
 
         if depth == self.max_depth:
+            self.visited_states[current_board.__hash__()] = best_move
             return best_move, self.game.evaluate(current_board, current_color)
 
         moves = self.game.generate_all_possible_moves(current_board, current_color)
@@ -37,17 +43,21 @@ class Agent:
 
 
             if value >= beta:
+                self.visited_states[current_board.__hash__()] = best_move
                 return best_move, value
             alpha = max(alpha, value)
 
+        self.visited_states[current_board.__hash__()] = best_move
         return best_move, value
 
     def min(self, current_board, current_color, depth, alpha, beta):
         best_move = None
         if self.game.check_terminal(current_board, current_color):
-            return best_move, self.game.evaluate(current_board, current_color)
+            self.visited_states[current_board.__hash__()] = best_move
+            return best_move, self.game.evaluate(current_board, current_color, 1000)
 
         if depth == self.max_depth:
+            self.visited_states[current_board.__hash__()] = best_move
             return best_move, self.game.evaluate(current_board, current_color)
 
         moves = self.game.generate_all_possible_moves(current_board, current_color)
@@ -64,8 +74,10 @@ class Agent:
 
 
             if value <= alpha:
+                self.visited_states[current_board.__hash__()] = best_move
                 return best_move, value
             beta = min(beta, value)
 
+        self.visited_states[current_board.__hash__()] = best_move
         return best_move, value
 
