@@ -172,7 +172,7 @@ class KonaneGame2:
         value += (possible_moves_weight * len(valid_moves_color))
         value -= (possible_moves_weight * len(valid_moves_opponent))
 
-        piece_count = score_weight * (board.count_symbol(1) - board.count_symbol(2))
+        piece_count = score_weight * (board.count_symbol(color) - board.count_symbol(self.opponent(color)))
 
 
         center_piece, edge_piece, corner_piece = self.count_position_score(board, color)

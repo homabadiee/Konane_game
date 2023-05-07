@@ -16,8 +16,8 @@ class PlayGame:
         game = KonaneGame()
         game2 = KonaneGame2()
         initial_board = Board(size, game.initialize_board(size))
-        agent1 = Agent(game, color=Tile.P_Black, max_depth=6)
-        agent2 = Agent(game2, color=Tile.P_White, max_depth=4)
+        agent1 = Agent(game2, color=Tile.P_Black, max_depth=4)
+        agent2 = Agent(game, color=Tile.P_White, max_depth=7)
         # bot vs bot
         play = PlayKonane(initial_board, game, agent1=agent1, agent2=agent2)
 
