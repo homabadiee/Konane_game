@@ -127,7 +127,7 @@ class KonaneGame2:
         """
         return Tile.P_Black if tile == Tile.P_White else Tile.P_White
 
-    def count_position_score(self, board):
+    def count_position_score(self, board, color):
         center_piece = 0
         edge_piece = 0
         corner_piece = 0
@@ -136,30 +136,34 @@ class KonaneGame2:
             for j in range(6):
                 # center
                 if (i == 2 or i == 3) and (j == 2 or j == 3):
-                    if board.contains(i, j, 1):
+                    if board.contains(i, j, color):
                         center_piece += 1
 
                 # corner
                 elif (i == 0 or i == 5) and (j == 0 or j == 5):
-                    if board.contains(i, j, 1):
+                    if board.contains(i, j, color):
                         corner_piece += 1
 
                 # edge
                 elif i == 0 or i == 5 or j == 0 or j == 5:
-                    if board.contains(i, j, 1):
+                    if board.contains(i, j, color):
                         edge_piece += 1
 
         return center_piece, edge_piece, corner_piece
 
+    def connectivity(self, board, color):
+        for i in range(6):
+            for j in range(6):
+                i = 2
 
 
     def evaluate(self, board, color, terminal_value = 0):
 
         possible_moves_weight = 8
         score_weight = 2
-        corner_weight = 5
+        corner_weight = 4
         center_weight = 2
-        edge_weight = 3
+        edge_weight = 2
 
         value = 0
         valid_moves_color = self.generate_all_possible_moves(board, color)
@@ -171,13 +175,13 @@ class KonaneGame2:
         piece_count = score_weight * (board.count_symbol(1) - board.count_symbol(2))
 
 
-        center_piece, edge_piece, corner_piece = self.count_position_score(board)
-        tmp = (center_piece * center_weight) + (edge_piece * edge_weight) + (corner_piece * corner_weight)
+        center_piece, edge_piece, corner_piece = self.count_position_score(board, color)
+        center_piece_op, edge_piece_op, corner_piece_op = self.count_position_score(board, self.opponent(color))
 
-        if color == Tile.P_White:
-            value += (piece_count + tmp)
-        else:
-            value -= (piece_count + tmp)
+        tmp = ((center_piece - center_piece_op) * center_weight) + ((edge_piece - edge_piece_op) * edge_weight) \
+              + ((corner_piece - corner_piece_op)* corner_weight)
+
+        value += tmp + piece_count
 
 
         value += terminal_value
